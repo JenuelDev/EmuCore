@@ -1,0 +1,7 @@
+State: Cancelled
+Result: Cancelled: Android reference launch cancelled
+Memory before cancellation: JobMemory {
+    peak_job_bytes: 3204612096,
+    peak_process_bytes: 3189452800,
+}
+Owned jobs released before returning.

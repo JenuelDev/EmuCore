@@ -114,10 +114,10 @@ Completion: the Rust host reliably owns external process lifetimes before implem
 
 ## P11: Rust external-engine lifecycle
 
-- [ ] Configure an explicit external engine, SDK/image paths, owned device, and resource profile.
-- [ ] Start, observe readiness, collect diagnostics/accounting, and stop through the tested Rust process owner.
-- [ ] Launch the owned Android fixture and preserve its existing native/input regressions.
-- [ ] Expose lifecycle states and actionable errors for the future game-library client.
+- [x] Configure an explicit external engine, SDK/image paths, owned device, and resource profile.
+- [x] Start, observe readiness, collect diagnostics/accounting, and stop through the tested Rust process owner.
+- [x] Launch the owned Android fixture and preserve its existing native/input regressions.
+- [x] Expose lifecycle states and actionable errors for the future game-library client.
 
 Completion: Rust coordinates an external Android reference reproducibly, with bounded failures and descendant cleanup. Engine/image distribution and target-game compatibility remain separate gates.
 
@@ -126,10 +126,11 @@ Completion: Rust coordinates an external Android reference reproducibly, with bo
 User requirement added on 2026-10-22: provide a client showing installed games; clicking a game is when its emulator starts.
 
 - [ ] Build a lightweight desktop game library that opens without booting Android.
-- [ ] Persist installed-game records and display each game's name/icon, installation state, and configured runtime profile.
+- [x] Persist bounded, validated installed-game records with runtime profiles and cached verification evidence.
+- [ ] Display and visually verify each game's name/icon, installation state, and configured runtime profile. The prototype lists text; custom icons are pending.
 - [ ] On game click, validate installation and configuration, start the required emulator only then, wait for Android readiness, and launch that game's package/activity.
 - [ ] Show starting, Android-ready, game-launching, running, and failed states while keeping the client responsive.
-- [ ] Prevent duplicate launch requests and handle an already running compatible instance explicitly.
+- [x] Prevent duplicate pending launch requests and handle an already running compatible instance explicitly, with gate and worker regressions.
 - [ ] Surface useful failure/retry controls through the Rust lifecycle API, including cancellation and process cleanup.
 - [ ] Verify the entire library-to-game flow using the owned fixture before testing legitimately installed target games.
 - [ ] Measure client startup, idle memory/CPU, and launch overhead on the low-end reference before selecting the final UI toolkit.
@@ -198,4 +199,4 @@ Completion: a reproducible package tested on the supported hardware and Windows 
 
 ## Immediate next task
 
-Implement P11 Rust external-engine lifecycle, then P12's lightweight installed-game client with emulator startup only after a game click. Continue M0 game/low-end evidence separately. Use the P7 metrics when selecting later direct-runtime optimizations.
+Continue P12's [desktop client](desktop-client.md). Resolve the external reference's missing app code after restart, complete live saved-library launch/reuse/cancellation, and visually review the native view when computer use works. Capture client idle measurements separately from the VM; custom icons and physical low-end measurements remain pending. Continue M0 game/low-end evidence separately. Use the P7 metrics when selecting later direct-runtime optimizations.

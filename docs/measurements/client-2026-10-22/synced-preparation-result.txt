@@ -1,0 +1,5 @@
+Verified owned x86_64 fixture before library insertion.
+Readiness: 22.9950154s
+Checksums: 2206585887 / 2873771296, touches: 1
+Graceful stop: true
+Capture: D:\Projects\Workplace\Vocphone\EmuCore\artifacts/client-preparation\1792678457067-350888

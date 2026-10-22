@@ -11,6 +11,7 @@ pub enum ErrorKind {
     Decode,
     Runtime,
     Host,
+    Cancelled,
 }
 
 #[derive(Debug)]

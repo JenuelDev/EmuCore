@@ -1,0 +1,33 @@
+Ready:
+ReadyInfo {
+    boot_completed: 20.9219616s,
+    package_ready: 21.1726178s,
+    build_fingerprint: "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.036/12592187:user/release-keys",
+    abis: [
+        "x86_64",
+        "arm64-v8a",
+    ],
+    native_bridge: "libndk_translation.so",
+    renderer: "Google (NVIDIA Corporation), Android Emulator OpenGL ES Translator (NVIDIA GeForce RTX 4080 Laptop GPU/PCIe/SSE2), OpenGL ES 3.1 (4.5.0 NVIDIA 617.42)",
+    configured_guest_memory_mb: 2560,
+    guest_memtotal_kib: 2532904,
+    memory_peaks: JobMemory {
+        peak_job_bytes: 3774181376,
+        peak_process_bytes: 3750506496,
+    },
+}
+Fixture:
+FixtureResult {
+    abi: Arm64,
+    startup_checksum: 2206585887,
+    touch_checksum: 2873771296,
+    touches: 1,
+}
+Shutdown:
+ShutdownInfo {
+    graceful: true,
+    memory_peaks: JobMemory {
+        peak_job_bytes: 4046528512,
+        peak_process_bytes: 4024410112,
+    },
+}

@@ -4,6 +4,7 @@ EmuCore aims to make PUBG Mobile and Mobile Legends responsive on low-end Window
 
 | Document | Purpose |
 | --- | --- |
+| [Shared agent guide](../AGENT.md) | Engineering rules and linked CLAUDE.md/AGENTS.md entry points |
 | [Development plan](development-plan.md) | Milestones, completion criteria, and immediate tasks |
 | [Architecture](architecture.md) | Proposed components, language direction, and technical unknowns |
 | [AOW research](aow-research.md) | Primary sources, recreation feasibility, and direct-execution experiments |
@@ -11,6 +12,8 @@ EmuCore aims to make PUBG Mobile and Mobile Legends responsive on low-end Window
 | [Android reference](android-reference.md) | Isolated external boot probe, renderer/input observations, memory, and retained failures |
 | [Owned Android fixture](android-native-fixture.md) | Source/build procedure and checked x86-64/ARM64 JNI execution with touch input |
 | [Host process ownership](host-processes.md) | Rust Windows jobs, process-tree cleanup, memory accounting, and regression evidence |
+| [Rust Android controller](rust-android-controller.md) | Explicit lifecycle, launch/cancellation, diagnostics, and live SDK-reference evidence |
+| [Desktop game library](desktop-client.md) | Inert persisted metadata, native client, lazy worker, validation, and remaining P12 work |
 | [First prototype](first-prototype.md) | Implemented ELF execution slice, build/run commands, limits, and next steps |
 | [Current runtime](runtime.md) | Current instruction coverage, limits, fixtures, and validation |
 | [Process startup](process-startup.md) | Guest stack, arguments, environment, auxiliary vector, and stack semantics |
@@ -24,7 +27,7 @@ EmuCore aims to make PUBG Mobile and Mobile Legends responsive on low-end Window
 
 ## Current focus
 
-P0 through P10 are implemented and tested. The direct runtime executes two compiled libc-free guests and provides stage profiling. The external SDK reference boots Android and passes owned x86-64/ARM64 JNI and input probes. Rust process-tree ownership is ready for P11 lifecycle integration, followed by P12's installed-game client with on-demand Android launch. Android on EmuCore's direct runtime and target-game compatibility remain unverified.
+P0 through P11 are implemented and tested. The direct runtime executes two compiled libc-free guests and provides stage profiling. The Rust controller manages the external SDK reference through owned process jobs, passes owned x86-64/ARM64 JNI and touch checks, and handles live startup cancellation. P12 adds the installed-game client with on-demand Android launch. Android on EmuCore's direct runtime and target-game compatibility remain unverified.
 
 ## Keeping these docs useful
 

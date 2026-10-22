@@ -11,6 +11,10 @@ use std::{
     net::{Ipv4Addr, SocketAddrV4, TcpListener, TcpStream},
     path::{Path, PathBuf},
     process::{Command, ExitStatus, Stdio},
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
     thread,
     time::{Duration, Instant},
 };
@@ -27,7 +31,32 @@ pub enum LifecycleState {
     ApplicationRunning,
     Stopping,
     Stopped,
+    Cancelled,
     Failed,
+}
+
+/// A per-launch cancellation signal that a responsive client can retain on another thread.
+#[derive(Clone, Debug, Default)]
+pub struct CancellationToken(Arc<AtomicBool>);
+
+impl CancellationToken {
+    pub fn cancel(&self) {
+        self.0.store(true, Ordering::Release);
+    }
+    pub fn is_cancelled(&self) -> bool {
+        self.0.load(Ordering::Acquire)
+    }
+
+    fn check(&self) -> Result<()> {
+        if self.is_cancelled() {
+            Err(Error::new(
+                ErrorKind::Cancelled,
+                "Android reference launch cancelled",
+            ))
+        } else {
+            Ok(())
+        }
+    }
 }
 
 /// Configuration construction is inert. Only ReferenceSession::start launches processes.
@@ -37,6 +66,9 @@ pub struct ReferenceConfig {
     pub workspace_root: PathBuf,
     pub output_directory: PathBuf,
     pub boot_timeout: Duration,
+    pub cancellation: CancellationToken,
+    /// Reference captures are headless by default; the desktop client opts in on launch.
+    pub visible: bool,
 }
 
 impl ReferenceConfig {
@@ -46,6 +78,8 @@ impl ReferenceConfig {
             workspace_root,
             output_directory,
             boot_timeout: Duration::from_secs(120),
+            cancellation: CancellationToken::default(),
+            visible: false,
         }
     }
 
@@ -133,6 +167,29 @@ pub struct ShutdownInfo {
     pub memory_peaks: JobMemory,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub enum FixtureAbi {
+    X86_64,
+    Arm64,
+}
+
+impl FixtureAbi {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::X86_64 => "x86_64",
+            Self::Arm64 => "arm64-v8a",
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct FixtureResult {
+    pub abi: FixtureAbi,
+    pub startup_checksum: u64,
+    pub touch_checksum: u64,
+    pub touches: u32,
+}
+
 struct CommandOutput {
     status: ExitStatus,
     stdout: String,
@@ -167,6 +224,7 @@ pub struct ReferenceSession {
 
 impl ReferenceSession {
     pub fn start(mut config: ReferenceConfig) -> Result<Self> {
+        config.cancellation.check()?;
         config.validate()?;
         // Hold unused ports until immediately before launching their respective owner.
         let mut reserved = Vec::new();
@@ -224,6 +282,7 @@ impl ReferenceSession {
             session.adb_server = Some(session.spawn_logged(&mut server, "adb-server")?);
             let started = Instant::now();
             loop {
+                session.config.cancellation.check()?;
                 if session.adb_server.as_mut().unwrap().try_wait()?.is_some() {
                     return Err(host("private adb server exited during startup"));
                 }
@@ -241,10 +300,12 @@ impl ReferenceSession {
                 thread::sleep(Duration::from_millis(100));
             }
             drop(reserved);
+            session.config.cancellation.check()?;
             let mut emulator = session.tool("emulator/emulator.exe");
             emulator.args([
                 "-avd",
                 "EmuCoreReference35",
+                "-verbose",
                 "-port",
                 "5580",
                 "-accel",
@@ -255,7 +316,6 @@ impl ReferenceSession {
                 "2048",
                 "-cores",
                 "2",
-                "-no-window",
                 "-no-audio",
                 "-no-snapshot",
                 "-no-boot-anim",
@@ -265,6 +325,9 @@ impl ReferenceSession {
                 "-camera-front",
                 "none",
             ]);
+            if !session.config.visible {
+                emulator.arg("-no-window");
+            }
             session.guest_started = Some(Instant::now());
             session.emulator = Some(session.spawn_logged(&mut emulator, "emulator")?);
             session.event("external Android process started; waiting for readiness")
@@ -281,6 +344,43 @@ impl ReferenceSession {
     }
     pub fn output_directory(&self) -> &Path {
         &self.config.output_directory
+    }
+
+    /// Replaces the signal between app requests on an already ready instance.
+    pub fn set_cancellation(&mut self, token: CancellationToken) -> Result<()> {
+        if !matches!(
+            self.state,
+            LifecycleState::AndroidReady | LifecycleState::ApplicationRunning
+        ) {
+            return Err(usage(
+                "only a ready instance can accept another launch signal",
+            ));
+        }
+        self.config.cancellation = token;
+        Ok(())
+    }
+
+    /// Nonblocking observation for a client whose user can close the guest window.
+    pub fn poll_exited(&mut self) -> Result<bool> {
+        let Some(emulator) = &mut self.emulator else {
+            return Ok(true);
+        };
+        match emulator.try_wait() {
+            Ok(None) => Ok(false),
+            Ok(Some(status)) => {
+                self.emulator.take();
+                self.adb_server.take();
+                self.state = LifecycleState::Stopped;
+                self.event(&format!(
+                    "emulator exited with {status}; owned jobs released"
+                ))?;
+                Ok(true)
+            }
+            Err(error) => {
+                self.fail(&error);
+                Err(error)
+            }
+        }
     }
 
     fn tool(&self, relative: &str) -> Command {
@@ -324,6 +424,7 @@ impl ReferenceSession {
     }
 
     fn run_command(&mut self, command: &mut Command, timeout: Duration) -> Result<CommandOutput> {
+        self.config.cancellation.check()?;
         let name = format!("command-{:04}", self.command_index);
         self.command_index = self
             .command_index
@@ -331,11 +432,19 @@ impl ReferenceSession {
             .ok_or_else(|| host("command index overflow"))?;
         self.event(&format!("{name}: {command:?}"))?;
         let mut process = self.spawn_logged(command, &name)?;
-        let Some(status) = process.wait_for(timeout)? else {
-            process.terminate()?;
-            return Err(host(format!(
-                "{name} exceeded {timeout:?}; inspect its retained logs"
-            )));
+        let started = Instant::now();
+        let status = loop {
+            self.config.cancellation.check()?;
+            let remaining = timeout.saturating_sub(started.elapsed());
+            if let Some(status) = process.wait_for(remaining.min(Duration::from_millis(100)))? {
+                break status;
+            }
+            if remaining.is_zero() {
+                process.terminate()?;
+                return Err(host(format!(
+                    "{name} exceeded {timeout:?}; inspect its retained logs"
+                )));
+            }
         };
         // End the complete command job before reading its files, even if a helper outlived the root.
         drop(process);
@@ -365,7 +474,11 @@ impl ReferenceSession {
     }
 
     fn fail(&mut self, error: &Error) {
-        self.state = LifecycleState::Failed;
+        self.state = if error.kind == ErrorKind::Cancelled {
+            LifecycleState::Cancelled
+        } else {
+            LifecycleState::Failed
+        };
         let _ = self.event(&error.to_string());
         self.emulator.take();
         self.adb_server.take();
@@ -373,9 +486,10 @@ impl ReferenceSession {
 
     /// Releases both private process trees immediately, without a graceful guest request.
     pub fn cancel(&mut self) {
+        self.config.cancellation.cancel();
         self.emulator.take();
         self.adb_server.take();
-        self.state = LifecycleState::Stopped;
+        self.state = LifecycleState::Cancelled;
         let _ = self.event("reference cancelled; owned jobs released");
     }
 
@@ -395,6 +509,7 @@ impl ReferenceSession {
             .guest_started
             .ok_or_else(|| host("missing guest start time"))?;
         let boot_completed = loop {
+            self.config.cancellation.check()?;
             if self
                 .emulator
                 .as_mut()
@@ -509,11 +624,19 @@ impl ReferenceSession {
                 "Android must be ready before launching an application",
             ));
         }
-        if self.application.as_deref() == Some(component) {
-            return Ok(());
-        }
-        self.state = LifecycleState::LaunchingApplication;
         let result = (|| {
+            if self.application.as_deref() == Some(component) {
+                let activities = self
+                    .adb(
+                        &["shell", "dumpsys", "activity", "activities"],
+                        COMMAND_TIMEOUT,
+                    )?
+                    .require_success("current activity")?;
+                if activity_resumed(&activities.stdout, component) {
+                    return Ok(());
+                }
+            }
+            self.state = LifecycleState::LaunchingApplication;
             self.event(&format!("launching {component}"))?;
             let launch = self
                 .adb(
@@ -534,9 +657,215 @@ impl ReferenceSession {
             self.event("application launch acknowledged")
         })();
         if let Err(error) = &result {
+            if error.kind != ErrorKind::Cancelled {
+                let _ = self.adb(&["shell", "pm", "list", "packages", "-3"], COMMAND_TIMEOUT);
+                let _ = self.adb(
+                    &[
+                        "logcat",
+                        "-d",
+                        "-v",
+                        "brief",
+                        "-s",
+                        "PackageManager:V",
+                        "PackageInstaller:V",
+                        "installd:V",
+                        "vold:V",
+                        "*:S",
+                    ],
+                    COMMAND_TIMEOUT,
+                );
+            }
             self.fail(error);
         }
         result
+    }
+
+    /// Runs only the owned probe package. Its UI hierarchy is a restricted test
+    /// contract, not a general Android UI automation parser.
+    pub fn verify_fixture(&mut self, apk: &Path, abi: FixtureAbi) -> Result<FixtureResult> {
+        if !matches!(
+            self.state,
+            LifecycleState::AndroidReady | LifecycleState::ApplicationRunning
+        ) {
+            return Err(usage("Android must be ready before the owned fixture"));
+        }
+        let result = self.verify_fixture_inner(apk, abi);
+        if let Err(error) = &result {
+            self.fail(error);
+        }
+        result
+    }
+
+    /// Verifies native execution and touch on the already installed owned probe.
+    /// Never installs an APK; intended to detect lost code after a device restart.
+    pub fn verify_installed_fixture(&mut self, abi: FixtureAbi) -> Result<FixtureResult> {
+        if !matches!(
+            self.state,
+            LifecycleState::AndroidReady | LifecycleState::ApplicationRunning
+        ) {
+            return Err(usage("Android must be ready before the owned fixture"));
+        }
+        let result = self.exercise_fixture(abi);
+        if let Err(error) = &result {
+            self.fail(error);
+        }
+        result
+    }
+
+    fn verify_fixture_inner(&mut self, apk: &Path, abi: FixtureAbi) -> Result<FixtureResult> {
+        let apk = fs::canonicalize(apk).map_err(|e| Error::io("resolve owned fixture APK", e))?;
+        let mut metadata = self.tool("build-tools/35.0.0/aapt2.exe");
+        metadata.args(["dump", "badging"]).arg(&apk);
+        let package = self
+            .run_command(&mut metadata, COMMAND_TIMEOUT)?
+            .require_success("owned APK metadata")?;
+        if !package
+            .stdout
+            .lines()
+            .any(|line| line.starts_with("package: name='dev.emucore.probe' "))
+            || !package
+                .stdout
+                .lines()
+                .any(|line| line.trim() == format!("native-code: '{}'", abi.name()))
+        {
+            return Err(usage(
+                "expected the owned probe package with exactly the selected ABI",
+            ));
+        }
+        self.event(&format!(
+            "installing owned {} fixture from {}",
+            abi.name(),
+            apk.display()
+        ))?;
+        let mut install = self.tool("platform-tools/adb.exe");
+        install
+            .args([
+                "-P",
+                "5039",
+                "-s",
+                "emulator-5580",
+                "install",
+                "--no-incremental",
+                "-r",
+            ])
+            .arg(&apk);
+        let installed = self
+            .run_command(&mut install, Duration::from_secs(15))?
+            .require_success("owned fixture install")?;
+        if !installed
+            .stdout
+            .lines()
+            .any(|line| line.trim() == "Success")
+        {
+            return Err(host("owned fixture install was not acknowledged"));
+        }
+        self.exercise_fixture(abi)
+    }
+
+    fn exercise_fixture(&mut self, abi: FixtureAbi) -> Result<FixtureResult> {
+        self.event("checking existing owned probe; no installation in this step")?;
+        self.adb(
+            &["shell", "am", "force-stop", "dev.emucore.probe"],
+            COMMAND_TIMEOUT,
+        )?
+        .require_success("stop earlier owned probe activity")?;
+        self.adb(&["logcat", "-c"], COMMAND_TIMEOUT)?
+            .require_success("clear owned guest log")?;
+        // Force-stop and fresh logs ensure this check observes a new native startup.
+        self.application = None;
+        self.launch_activity("dev.emucore.probe/.ProbeActivity")?;
+        let ready = format!("READY abi={} checksum=2206585887 touches=0", abi.name());
+        self.wait_fixture_log(&ready, "fixture-ready.log")?;
+        self.adb(
+            &[
+                "shell",
+                "uiautomator",
+                "dump",
+                "/data/local/tmp/emucore-rust-ui.xml",
+            ],
+            Duration::from_secs(10),
+        )?
+        .require_success("owned fixture hierarchy")?;
+        let hierarchy = self
+            .adb(
+                &["shell", "cat", "/data/local/tmp/emucore-rust-ui.xml"],
+                COMMAND_TIMEOUT,
+            )?
+            .require_success("read owned fixture hierarchy")?;
+        write_new(
+            &self.config.output_directory.join("fixture-ui.xml"),
+            &hierarchy.stdout,
+        )?;
+        let (x, y) = fixture_button_center(&hierarchy.stdout)?;
+        self.adb(
+            &["shell", "input", "tap", &x.to_string(), &y.to_string()],
+            COMMAND_TIMEOUT,
+        )?
+        .require_success("owned fixture touch")?;
+        let touched = format!("TOUCH abi={} checksum=2873771296 touches=1", abi.name());
+        self.wait_fixture_log(&touched, "fixture-touch.log")?;
+        thread::sleep(Duration::from_millis(500));
+        self.adb(
+            &[
+                "shell",
+                "screencap",
+                "-p",
+                "/data/local/tmp/emucore-rust-screen.png",
+            ],
+            COMMAND_TIMEOUT,
+        )?
+        .require_success("owned fixture screenshot")?;
+        let screenshot = self.config.output_directory.join("screen.png");
+        if screenshot.exists() {
+            return Err(usage("reference screenshot already exists"));
+        }
+        let mut pull = self.tool("platform-tools/adb.exe");
+        pull.args([
+            "-P",
+            "5039",
+            "-s",
+            "emulator-5580",
+            "pull",
+            "/data/local/tmp/emucore-rust-screen.png",
+        ])
+        .arg(&screenshot);
+        self.run_command(&mut pull, COMMAND_TIMEOUT)?
+            .require_success("owned fixture screenshot transfer")?;
+        self.event(&format!(
+            "owned {} native startup and UI touch checks passed",
+            abi.name()
+        ))?;
+        Ok(FixtureResult {
+            abi,
+            startup_checksum: 2_206_585_887,
+            touch_checksum: 2_873_771_296,
+            touches: 1,
+        })
+    }
+
+    fn wait_fixture_log(&mut self, expected: &str, filename: &str) -> Result<()> {
+        let started = Instant::now();
+        loop {
+            let log = self
+                .adb(
+                    &["logcat", "-d", "-v", "brief", "-s", "EmuCoreProbe:I", "*:S"],
+                    COMMAND_TIMEOUT,
+                )?
+                .require_success("read owned fixture log")?;
+            if log
+                .stdout
+                .lines()
+                .any(|line| line.ends_with(&format!(": {expected}")))
+            {
+                write_new(&self.config.output_directory.join(filename), &log.stdout)?;
+                return Ok(());
+            }
+            if log.stdout.contains("FAIL") || started.elapsed() >= Duration::from_secs(5) {
+                write_new(&self.config.output_directory.join(filename), &log.stdout)?;
+                return Err(host(format!("owned fixture did not report {expected}")));
+            }
+            thread::sleep(Duration::from_millis(100));
+        }
     }
 
     pub fn stop(&mut self) -> Result<ShutdownInfo> {
@@ -548,6 +877,9 @@ impl ReferenceSession {
         }
         self.state = LifecycleState::Stopping;
         let result = (|| {
+            self.event("flushing guest filesystem before emulator shutdown")?;
+            self.adb(&["shell", "sync"], COMMAND_TIMEOUT)?
+                .require_success("guest filesystem sync")?;
             self.event("requesting graceful emulator shutdown")?;
             self.adb(&["emu", "kill"], COMMAND_TIMEOUT)?
                 .require_success("emulator shutdown request")?;
@@ -589,7 +921,7 @@ impl Drop for ReferenceSession {
     }
 }
 
-fn valid_component(component: &str) -> bool {
+pub(crate) fn valid_component(component: &str) -> bool {
     let Some((package, activity)) = component.split_once('/') else {
         return false;
     };
@@ -604,6 +936,76 @@ fn valid_component(component: &str) -> bool {
         })
     };
     valid_name(package) && valid_name(activity.strip_prefix('.').unwrap_or(activity))
+}
+
+fn normalized_component(component: &str) -> Option<String> {
+    if !valid_component(component) {
+        return None;
+    }
+    let (package, activity) = component.split_once('/')?;
+    Some(if activity.starts_with('.') {
+        format!("{package}/{package}{activity}")
+    } else {
+        component.to_owned()
+    })
+}
+
+fn activity_resumed(dump: &str, component: &str) -> bool {
+    let Some(expected) = normalized_component(component) else {
+        return false;
+    };
+    dump.lines()
+        .filter(|line| {
+            let line = line.trim();
+            line.starts_with("topResumedActivity=") || line.starts_with("mResumedActivity=")
+        })
+        .any(|line| {
+            line.split_whitespace().any(|word| {
+                normalized_component(word.trim_end_matches(['}', ','])).as_deref()
+                    == Some(expected.as_str())
+            })
+        })
+}
+
+fn fixture_button_center(hierarchy: &str) -> Result<(u32, u32)> {
+    let mut buttons = hierarchy.split("<node ").filter(|node| {
+        node.split('>')
+            .next()
+            .is_some_and(|tag| tag.contains("content-desc=\"Run native check\""))
+    });
+    let button = buttons
+        .next()
+        .ok_or_else(|| host("owned fixture button was not found"))?;
+    if buttons.next().is_some() {
+        return Err(host("owned fixture button is ambiguous"));
+    }
+    let bounds = button
+        .split('>')
+        .next()
+        .and_then(|tag| tag.split("bounds=\"").nth(1))
+        .and_then(|value| value.split('"').next())
+        .ok_or_else(|| host("owned fixture button bounds missing"))?;
+    let parts: Vec<_> = bounds
+        .split(['[', ']', ','])
+        .filter(|part| !part.is_empty())
+        .collect();
+    if parts.len() != 4 {
+        return Err(host("invalid owned fixture button bounds"));
+    }
+    let values: Vec<u32> = parts
+        .iter()
+        .map(|part| part.parse())
+        .collect::<std::result::Result<_, _>>()
+        .map_err(|_| host("invalid owned fixture button coordinate"))?;
+    if bounds != format!("[{},{}][{},{}]", values[0], values[1], values[2], values[3])
+        || values[0] >= values[2]
+        || values[1] >= values[3]
+        || values[2] > 720
+        || values[3] > 1280
+    {
+        return Err(host("owned fixture button exceeds expected display bounds"));
+    }
+    Ok(((values[0] + values[2]) / 2, (values[1] + values[3]) / 2))
 }
 
 fn property<'a>(text: &'a str, key: &str) -> Option<&'a str> {
@@ -642,4 +1044,238 @@ fn usage(message: impl Into<String>) -> Error {
 }
 fn host(message: impl Into<String>) -> Error {
     Error::new(ErrorKind::Host, message)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::AtomicUsize;
+
+    static NEXT_DIRECTORY: AtomicUsize = AtomicUsize::new(0);
+
+    struct Directory(PathBuf);
+    impl Directory {
+        fn new() -> Self {
+            let path = std::env::temp_dir().join(format!(
+                "emucore-reference-{}-{}",
+                std::process::id(),
+                NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed)
+            ));
+            fs::create_dir(&path).unwrap();
+            Self(path)
+        }
+
+        fn prepared(&self) -> ReferenceConfig {
+            let workspace = self.0.join("workspace");
+            let sdk = self.0.join("sdk");
+            for path in [
+                workspace.join("artifacts"),
+                workspace.join(".tools/android/avd/EmuCoreReference35.avd"),
+                sdk.join("emulator"),
+                sdk.join("platform-tools"),
+                sdk.join("system-images/android-35/google_apis_playstore/x86_64"),
+            ] {
+                fs::create_dir_all(path).unwrap();
+            }
+            fs::write(sdk.join("emulator/emulator.exe"), b"not executable").unwrap();
+            fs::write(sdk.join("platform-tools/adb.exe"), b"not executable").unwrap();
+            fs::write(
+                sdk.join("system-images/android-35/google_apis_playstore/x86_64/source.properties"),
+                "Pkg.Revision=9\n",
+            )
+            .unwrap();
+            fs::write(
+                workspace.join(".tools/android/avd/EmuCoreReference35.avd/.emucore-reference"),
+                MARKER,
+            )
+            .unwrap();
+            ReferenceConfig::new(sdk, workspace, PathBuf::from("artifacts/capture"))
+        }
+    }
+    impl Drop for Directory {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
+    fn components_allow_named_activities_and_reject_shell_metacharacters() {
+        for value in [
+            "dev.emucore.probe/.ProbeActivity",
+            "dev.emucore.probe/dev.emucore.probe.ProbeActivity",
+        ] {
+            assert!(valid_component(value));
+        }
+        for value in [
+            "",
+            "single/.A",
+            "dev.probe/",
+            "dev..probe/.A",
+            "dev.probe/.A;echo",
+            "dev.probe/.A extra",
+            "dev.probe/$(x)",
+            "dev.probe/.A/other",
+            "dev.probe/.A\n",
+            "dev.probe/.A$Inner",
+        ] {
+            assert!(!valid_component(value), "accepted {value:?}");
+        }
+    }
+
+    #[test]
+    fn resumed_activity_matches_normalized_complete_component_only() {
+        let short = "dev.emucore.probe/.ProbeActivity";
+        let full = "dev.emucore.probe/dev.emucore.probe.ProbeActivity";
+        let dump = format!(" topResumedActivity=ActivityRecord{{123 u0 {short} t9}}\n");
+        assert!(activity_resumed(&dump, full));
+        assert!(!activity_resumed(&dump, "dev.emucore.probe/.Probe"));
+        assert!(!activity_resumed(
+            &format!("mLastPausedActivity=ActivityRecord{{123 u0 {short} t9}}"),
+            short
+        ));
+        assert!(!activity_resumed("topResumedActivity=null", short));
+    }
+
+    #[test]
+    fn button_bounds_are_unique_positive_and_inside_the_known_display() {
+        let node = |bounds: &str| {
+            format!(
+                "<hierarchy><node bounds=\"{bounds}\" content-desc=\"Run native check\" /></hierarchy>"
+            )
+        };
+        assert_eq!(
+            fixture_button_center(&node("[56,501][664,573]")).unwrap(),
+            (360, 537)
+        );
+        for bounds in [
+            "[-1,0][50,20]",
+            "[0,0][721,1280]",
+            "[0,0][720,1281]",
+            "[50,10][20,30]",
+            "[0,0][0,5]",
+            "[1,2,3]",
+            "[4294967295,0][1,1]",
+            "[1,2] [3,4]",
+        ] {
+            assert!(
+                fixture_button_center(&node(bounds)).is_err(),
+                "accepted {bounds}"
+            );
+        }
+        assert!(fixture_button_center("<hierarchy />").is_err());
+        assert!(fixture_button_center(&(node("[0,0][10,10]") + &node("[20,20][30,30]"))).is_err());
+    }
+
+    #[test]
+    fn property_parser_matches_whitespace_but_never_a_key_prefix() {
+        let properties = "#comment\nhw.ramSize.extra = 1\nhw.ramSize = 2560\n";
+        assert_eq!(property(properties, "hw.ramSize"), Some("2560"));
+        assert_eq!(property(properties, "hw.cpu.ncore"), None);
+    }
+
+    #[test]
+    fn validation_is_inert_and_preserves_existing_or_external_output() {
+        let directory = Directory::new();
+        let original = directory.prepared();
+        let mut config = original.clone();
+        config.validate().unwrap();
+        assert!(!config.output_directory.exists());
+        fs::create_dir(&config.output_directory).unwrap();
+        assert_eq!(
+            original.clone().validate().unwrap_err().kind,
+            ErrorKind::Usage
+        );
+        let outside = directory.0.join("outside");
+        fs::create_dir(&outside).unwrap();
+        let mut external = original.clone();
+        external.output_directory = outside.join("capture");
+        assert_eq!(external.validate().unwrap_err().kind, ErrorKind::Usage);
+        assert!(!outside.join("capture").exists());
+        fs::write(
+            original
+                .workspace_root
+                .join(".tools/android/avd/EmuCoreReference35.avd/.emucore-reference"),
+            "not owned",
+        )
+        .unwrap();
+        assert_eq!(
+            original.clone().validate().unwrap_err().kind,
+            ErrorKind::Usage
+        );
+    }
+
+    #[test]
+    fn cancellation_before_start_never_resolves_or_launches_an_sdk() {
+        let config = ReferenceConfig::new(
+            "missing-sdk".into(),
+            "missing-workspace".into(),
+            "capture".into(),
+        );
+        let token = config.cancellation.clone();
+        assert!(!token.is_cancelled());
+        token.cancel();
+        let error = match ReferenceSession::start(config) {
+            Ok(_) => panic!("cancelled launch started"),
+            Err(error) => error,
+        };
+        assert_eq!(error.kind, ErrorKind::Cancelled);
+    }
+
+    #[test]
+    fn bounded_evidence_rejects_oversized_tool_output() {
+        let directory = Directory::new();
+        let file = directory.0.join("large.log");
+        fs::write(&file, vec![b'x'; MAX_COMMAND_OUTPUT as usize + 1]).unwrap();
+        assert_eq!(read_bounded(&file).unwrap_err().kind, ErrorKind::Host);
+    }
+
+    #[test]
+    fn cancellation_interrupts_a_running_owned_command() {
+        let directory = Directory::new();
+        let config = directory.prepared();
+        fs::create_dir(config.workspace_root.join("artifacts/capture")).unwrap();
+        let token = config.cancellation.clone();
+        let marker = directory.0.join("command-ready");
+        let observer_marker = marker.clone();
+        let cancelled = thread::spawn(move || {
+            let started = Instant::now();
+            while !observer_marker.exists() && started.elapsed() < Duration::from_secs(5) {
+                thread::sleep(Duration::from_millis(10));
+            }
+            token.cancel();
+            assert!(observer_marker.exists(), "owned helper never started");
+        });
+        let output = config.workspace_root.join("artifacts/capture");
+        let mut session = ReferenceSession {
+            config: ReferenceConfig {
+                output_directory: output.clone(),
+                ..config
+            },
+            state: LifecycleState::Starting,
+            adb_server: None,
+            emulator: None,
+            clock: Instant::now(),
+            guest_started: None,
+            events: create_file(&output.join("events.txt")).unwrap(),
+            command_index: 0,
+            application: None,
+            shutdown_info: None,
+        };
+        let mut command = Command::new(std::env::current_exe().unwrap());
+        command
+            .args([
+                "--exact",
+                "native::process::tests::helper_process",
+                "--nocapture",
+                "--test-threads=1",
+            ])
+            .env("EMUCORE_TEST_JOB_MODE", "loop")
+            .env("EMUCORE_TEST_JOB_MARKER", marker);
+        let result = session.run_command(&mut command, Duration::from_secs(30));
+        cancelled.join().unwrap();
+        match result {
+            Ok(_) => panic!("cancelled command succeeded"),
+            Err(error) => assert_eq!(error.kind, ErrorKind::Cancelled),
+        }
+    }
 }

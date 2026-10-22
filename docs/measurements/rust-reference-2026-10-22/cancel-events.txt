@@ -1,0 +1,5 @@
+0.002ms Starting: validating external engine acceleration
+0.102ms Starting: command-0000: "\\\\?\\C:\\Users\\me\\AppData\\Local\\Android\\Sdk\\emulator\\emulator.exe" "-version"
+171.112ms Starting: command-0001: "\\\\?\\C:\\Users\\me\\AppData\\Local\\Android\\Sdk\\emulator\\emulator.exe" "-accel-check"
+689.223ms Starting: external Android process started; waiting for readiness
+2689.629ms Cancelled: Cancelled: Android reference launch cancelled

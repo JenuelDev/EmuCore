@@ -1,0 +1,58 @@
+{
+  "measured_at_utc": "2026-10-22T14:16:06.5080948Z",
+  "executable_sha256": "F32B63BFF9599BCE31AD203DAE04711F766EBA6CBDECFB0C06FC8B28F7B9845F",
+  "library_sha256": "683CAECFD5E5798136734B9A5B63389474376C402450FE11C210ADC274BE4E7B",
+  "boundary": "Hidden release process, launch to WaitForInputIdle and observed idle snapshots. Includes process creation. No UI input, Android launch, visual verification, cold-cache guarantee, or low-end inference. Process forcibly ended after each sample.",
+  "runs": [
+    {
+      "run": 0,
+      "launch_to_message_queue_idle_ms": 264.5382,
+      "idle_observation_ms": 8140.3073,
+      "process_cpu_delta_ms": 0.0,
+      "private_bytes_snapshot": 1769472,
+      "working_set_bytes_snapshot": 11153408,
+      "peak_working_set_bytes": 11153408,
+      "sdk_reference_listeners": 0
+    },
+    {
+      "run": 1,
+      "launch_to_message_queue_idle_ms": 113.5554,
+      "idle_observation_ms": 8340.3439,
+      "process_cpu_delta_ms": 0.0,
+      "private_bytes_snapshot": 1744896,
+      "working_set_bytes_snapshot": 10690560,
+      "peak_working_set_bytes": 10690560,
+      "sdk_reference_listeners": 0
+    },
+    {
+      "run": 2,
+      "launch_to_message_queue_idle_ms": 110.7922,
+      "idle_observation_ms": 8376.1428,
+      "process_cpu_delta_ms": 0.0,
+      "private_bytes_snapshot": 1761280,
+      "working_set_bytes_snapshot": 11051008,
+      "peak_working_set_bytes": 11051008,
+      "sdk_reference_listeners": 0
+    },
+    {
+      "run": 3,
+      "launch_to_message_queue_idle_ms": 106.9054,
+      "idle_observation_ms": 8051.363,
+      "process_cpu_delta_ms": 15.625,
+      "private_bytes_snapshot": 1753088,
+      "working_set_bytes_snapshot": 10706944,
+      "peak_working_set_bytes": 10706944,
+      "sdk_reference_listeners": 0
+    },
+    {
+      "run": 4,
+      "launch_to_message_queue_idle_ms": 106.5931,
+      "idle_observation_ms": 7976.3653,
+      "process_cpu_delta_ms": 0.0,
+      "private_bytes_snapshot": 1777664,
+      "working_set_bytes_snapshot": 11071488,
+      "peak_working_set_bytes": 11071488,
+      "sdk_reference_listeners": 0
+    }
+  ]
+}

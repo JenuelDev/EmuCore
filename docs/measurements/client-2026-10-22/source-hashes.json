@@ -1,0 +1,26 @@
+[
+  {
+    "Path": "D:\\Projects\\Workplace\\Vocphone\\EmuCore\\src\\client.rs",
+    "Hash": "30FCCAA35236E197FB04162D6F815CEFA4EABEB71B0A8B7D0522A90F9230C25C"
+  },
+  {
+    "Path": "D:\\Projects\\Workplace\\Vocphone\\EmuCore\\src\\game_library.rs",
+    "Hash": "1087983AA4689A244495E7D33F372F76E77711D781BFF1508C06B6F1117BE66D"
+  },
+  {
+    "Path": "D:\\Projects\\Workplace\\Vocphone\\EmuCore\\src\\launch_gate.rs",
+    "Hash": "FBDF20A17178BB417E81D8A3FBCDA6B98C2388BB3B9C7A626D5983BF8C0BC981"
+  },
+  {
+    "Path": "D:\\Projects\\Workplace\\Vocphone\\EmuCore\\src\\native\\client.rs",
+    "Hash": "E06227F39E1FFB23E3A1B8707F1B3854655C5B0DC001168AAEE8176A3A84C2DF"
+  },
+  {
+    "Path": "D:\\Projects\\Workplace\\Vocphone\\EmuCore\\src\\android_reference.rs",
+    "Hash": "56730D7DD1DA7F779D5C0A1609CE02854A436670F8EE9444618711D458DAED39"
+  },
+  {
+    "Path": "D:\\Projects\\Workplace\\Vocphone\\EmuCore\\Cargo.lock",
+    "Hash": "2D093ADFF996D5AF552560F25DCBA4EC99EBD9625E2CB7BEF42A2E0636562EE7"
+  }
+]

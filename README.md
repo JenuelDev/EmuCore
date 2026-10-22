@@ -53,7 +53,7 @@ Record the GameLoop version and configuration, Windows version, CPU, GPU, RAM, g
 
 ## Current status
 
-The planned desktop client will show installed games without starting Android. Clicking a game will start its configured emulator and launch that game after Android is ready. This on-demand library flow is tracked as P12 in the [development plan](docs/development-plan.md).
+The [desktop client prototype](docs/desktop-client.md) persists game records and opens its library without starting Android. Its lazy worker starts the configured reference emulator only after an explicit launch request. P12 remains in progress, including live persistence, UI review, icons, and low-end measurements. See the [development plan](docs/development-plan.md).
 
 The Rust prototype executes two independently compiled, libc-free x86-64 guests using checked memory, process startup, arithmetic, bounded control flow across executable segments, function calls, and anonymous memory-management calls. A reference backend checks native translation behavior. Stage profiling and [initial runtime measurements](docs/runtime-measurements.md) are available. It does not run Android or either target game yet. No gaming performance results exist.
 
@@ -61,5 +61,5 @@ See [current runtime and run commands](docs/runtime.md) to build and try it, inc
 
 Development documentation starts at [docs/README.md](docs/README.md). Product architecture, Android integration, graphics backend, and UI framework remain open decisions.
 
-An [external Android reference](docs/android-reference.md) now boots using the already installed SDK with WHPX and host graphics. An [owned JNI fixture](docs/android-native-fixture.md) passes checked native computations and touch input in separate x86-64 and ARM64 APKs. This reference uses the SDK's engine and translation components; Android does not yet run on EmuCore's direct-execution runtime.
+An [external Android reference](docs/android-reference.md) boots using the already installed SDK with WHPX and host graphics. The [Rust lifecycle controller](docs/rust-android-controller.md) now manages that reference, including owned process cleanup and cancellation. An [owned JNI fixture](docs/android-native-fixture.md) passes checked native computations and touch input in separate x86-64 and ARM64 APKs. This reference uses the SDK's engine and translation components; Android does not yet run on EmuCore's direct-execution runtime.
 

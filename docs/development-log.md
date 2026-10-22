@@ -137,6 +137,28 @@ Validation: all 82 tests pass in debug and release, with strict Clippy, formatti
 
 Next: P11 Rust external-engine lifecycle, then the user's P12 installed-game library with Android startup on game click.
 
+## 2026-10-22: Connected agent guides and Rust Android lifecycle
+
+Created CLAUDE.md and AGENT.md with reciprocal links and shared engineering/project instructions. Added AGENTS.md as a standard discovery entry point linking to the same guide. Documentation and link checks pass.
+
+Completed P11: Rust now explicitly validates/starts the external reference, observes readiness, captures diagnostics and job commit peaks, launches activities, verifies the owned native/touch fixture, cancels through a shared token, and shuts down owned process trees. Configuration creation remains inert. Added safe component validation, current-activity confirmation before skipping a repeated launch, bounded evidence, and lifecycle events.
+
+Validation: 90 tests pass in debug and release, strict Clippy, formatting, both static-guest comparisons, PowerShell syntax, and documentation checks. Final x86-64 and ARM64 live runs passed native and touch checks with inspected screenshots and graceful shutdown. Live cancellation after two seconds of boot activity returned Cancelled and released the private ports. Selected results and source/executable identifiers are in [controller evidence](rust-android-controller.md).
+
+Next: P12 persisted installed-game library and lightweight desktop frontend. Opening it must not boot Android; a game launch request starts the configured runtime. Game compatibility and low-end performance remain unverified.
+
+## 2026-10-22: Persisted game library and lazy desktop worker
+
+Implemented schema-versioned bounded game/profile metadata with strict validation, Unicode round trips, a nonblocking OS writer lock, exclusive temporary files, synced writes, and rename replacement. Added installation-evidence timestamps, normalized-target duplicate checks, and preservation of malformed/future metadata. Retained pinned JSON/derive dependency notices.
+
+Added serial launch tickets, stale-completion rejection, compatible-instance reuse, a lazy background engine worker, cancellation, stop/retry, external-exit observation, and client-close cleanup. Added a provisional native Windows library view with launch/stop/reload controls. Ordinary row selection stays inert; launch requires double-click or the launch button. The controller's guest window is opt-in on launch. Added explicit owned-fixture library preparation and a live saved-library exercise.
+
+Validation: the full workflow passed 110 tests in debug and release, strict Clippy, formatting, both compiled static-guest comparisons, script syntax, and documentation checks. This includes eight metadata, five launch-gate, and seven worker tests. Four live saved-library launches failed: the fixture was verified within one boot, but Android could not find its activity after restart. Package-manager logs identify missing scanned code and vold reports an unclean filesystem. Non-incremental installation alone did not fix it. A later sync-before-shutdown addition compiled and passed live preparation/native/touch/shutdown checks; restart persistence after sync is the next check. Failed captures are preserved. Ordinary launch does not silently reinstall.
+
+Five hidden release-client samples completed with no private reference listeners: median launch-to-message-queue-idle 110.8 ms and median working-set snapshot 10.54 MiB on the development laptop. These are process-only observations, not visual, gaming, or low-end results. An earlier idle attempt correctly refused a concurrently running diagnostic VM. See [selected raw evidence](measurements/client-2026-10-22/README.md).
+
+The computer-use helper failed initialization with CreateRestrictedToken error 87, including retry/reset. Visual and visible-guest interaction checks remain pending. P12 is not complete. The goal tracker reported usageLimited, so work stopped after finishing the in-flight measurement, confirming zero remaining client processes/reference listeners, and recording this handoff. See the [desktop client contract](desktop-client.md) for setup, boundaries, and current work.
+
 ## Entry template
 
 - Date:

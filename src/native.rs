@@ -1,6 +1,8 @@
 //! The only unsafe module. Guest bytes are decoded, never copied into executable memory.
 
 #[cfg(windows)]
+pub(crate) mod client;
+#[cfg(windows)]
 pub(crate) mod process;
 
 #[cfg(windows)]

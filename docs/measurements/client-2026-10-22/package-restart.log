@@ -1,0 +1,280 @@
+--------- beginning of system
+I/vold    (  160): Vold 3.0 (the awakening) firing up
+D/vold    (  160): Detected support for: ext4 f2fs vfat
+I/vold    (  160): [libfstab] Using Android DT directory /proc/device-tree/firmware/android/
+D/vold    (  160): VoldNativeService::start() completed OK
+D/vold    (  160): fscrypt_mount_metadata_encrypted: /data encrypt: 0 format: 0 with null block device: /dev/block/vdc with zoned 0
+D/vold    (  160): metadata_key_dir/key: /metadata/vold/metadata_encryption/key
+D/vold    (  160): Key exists, using: /metadata/vold/metadata_encryption/key
+D/vold    (  160): Mounting metadata-encrypted filesystem:/data
+I/vold    (  160): AIDL IBootControl not available, falling back to HIDL.
+E/vold    (  160): Error getting bootctrl v1.0 module.
+I/vold    (  160): [libfs_mgr] superblock s_max_mnt_count:65535,/dev/block/mapper/userdata
+I/vold    (  160): [libfs_mgr] Filesystem on /dev/block/mapper/userdata was not cleanly shutdown; state flags: 0x1, incompat feature flags: 0x30046
+I/vold    (  160): [libfs_mgr] check_fs(): mount(/dev/block/mapper/userdata,/data,ext4)=0: Success
+I/vold    (  160): [libfs_mgr] umount_retry(): unmount(/data) succeeded
+I/vold    (  160): [libfs_mgr] Running /system/bin/e2fsck on /dev/block/dm-46
+I/vold    (  160): [libfs_mgr] superblock s_max_mnt_count:65535,/dev/block/mapper/userdata
+W/vold    (  160): [libfs_mgr] Reserved blocks 32768 is too large; capping to 31457
+I/vold    (  160): [libfs_mgr] __mount(source=/dev/block/mapper/userdata,target=/data,type=ext4)=0: Success
+D/vold    (  160): Mounted /data
+I/vold    (  160): fscrypt_initialize_systemwide_keys
+D/vold    (  160): Key exists, using: /data/unencrypted/key
+D/vold    (  160): Installed fscrypt key with ref c56b8340c59c0959af1fe87cfc599928 to /data
+I/vold    (  160): Wrote system DE key reference to:/data/unencrypted/ref
+D/vold    (  160): Generating standard storage key
+D/vold    (  160): Installed fscrypt key with ref da969a0284648ab9573271d58dbf24e0 to /data
+I/vold    (  160): Wrote per boot key reference to:/data/unencrypted/per_boot_ref
+E/vold    (  160): keystore2 Keystore earlyBootEnded returned service specific error: -68
+D/vold    (  160): fscrypt_init_user0
+D/vold    (  160): Preparing: /data/misc/vold/user_keys
+D/vold    (  160): Preparing: /data/misc/vold/user_keys/ce
+D/vold    (  160): Preparing: /data/misc/vold/user_keys/de
+D/vold    (  160): Installed fscrypt key with ref 6b54ae3075c48ada95b2c3dbeec579b2 to /data
+D/vold    (  160): Installed de key for user 0
+D/vold    (  160): Preparing: /data/data
+D/vold    (  160): Preparing: /data/user/0
+D/vold    (  160): Preparing: /data/media/obb
+D/vold    (  160): fscrypt_prepare_user_storage for volume null, user 0, flags 1
+D/vold    (  160): Preparing: /data/system/users/0
+D/vold    (  160): Preparing: /data/misc/profiles/cur/0
+D/vold    (  160): Preparing: /data/system_de/0
+I/vold    (  160): Verified that /data/system_de/0 has the encryption policy 6b54ae3075c48ada95b2c3dbeec579b2 v2 modes 1/4 flags 0x2
+D/vold    (  160): Preparing: /data/vendor_de/0
+I/vold    (  160): Verified that /data/vendor_de/0 has the encryption policy 6b54ae3075c48ada95b2c3dbeec579b2 v2 modes 1/4 flags 0x2
+D/vold    (  160): Preparing: /data/misc_de/0
+I/vold    (  160): Verified that /data/misc_de/0 has the encryption policy 6b54ae3075c48ada95b2c3dbeec579b2 v2 modes 1/4 flags 0x2
+D/vold    (  160): Preparing: /data/user_de/0
+I/vold    (  160): Verified that /data/user_de/0 has the encryption policy 6b54ae3075c48ada95b2c3dbeec579b2 v2 modes 1/4 flags 0x2
+D/vold    (  160): /system/bin/vold_prepare_subdirs
+D/vold    (  160):     prepare
+D/vold    (  160):     
+D/vold    (  160):     0
+D/vold    (  160):     1
+I/installd(  464): installd firing up
+W/PackageManager(  550): No package known for package restrictions com.google.android.devicelock
+W/PackageManager(  550): No package known for package restrictions com.google.android.tzdata6
+W/PackageManager(  550): No package known for package restrictions com.google.android.ondevicepersonalization
+W/PackageManager(  550): No package known for package restrictions com.android.hardware.authsecret
+W/PackageManager(  550): No package known for package restrictions com.google.android.media.swcodec
+W/PackageManager(  550): No package known for package restrictions com.google.android.os.statsd
+W/PackageManager(  550): No package known for package restrictions com.google.android.widevine.nonupdatable
+W/PackageManager(  550): No package known for package restrictions com.google.mainline.primary.libs
+W/PackageManager(  550): No package known for package restrictions com.google.android.extservices
+W/PackageManager(  550): No package known for package restrictions com.android.hardware.rebootescrow
+W/PackageManager(  550): No package known for package restrictions com.google.android.healthfitness
+W/PackageManager(  550): No package known for package restrictions com.google.android.ipsec
+W/PackageManager(  550): No package known for package restrictions com.google.android.media
+W/PackageManager(  550): No package known for package restrictions com.android.i18n
+W/PackageManager(  550): No package known for package restrictions com.android.virt
+W/PackageManager(  550): No package known for package restrictions com.google.android.appsearch
+W/PackageManager(  550): No package known for package restrictions com.google.android.configinfrastructure
+W/PackageManager(  550): No package known for package restrictions com.google.android.cellbroadcast
+W/PackageManager(  550): No package known for package restrictions com.android.apex.cts.shim
+W/PackageManager(  550): No package known for package restrictions com.android.compos
+W/PackageManager(  550): No package known for package restrictions com.google.android.resolv
+W/PackageManager(  550): No package known for package restrictions com.google.android.sdkext
+W/PackageManager(  550): No package known for package restrictions com.google.android.art
+W/PackageManager(  550): No package known for package restrictions com.google.android.uwb
+W/PackageManager(  550): No package known for package restrictions com.google.android.runtime
+W/PackageManager(  550): No package known for package restrictions com.android.hardware.cas
+W/PackageManager(  550): No package known for package restrictions com.google.android.adservices
+W/PackageManager(  550): No package known for package restrictions com.google.android.scheduling
+W/PackageManager(  550): No package known for package restrictions com.google.android.mediaprovider
+W/PackageManager(  550): No package known for package restrictions com.android.hardware.neuralnetworks
+W/PackageManager(  550): No package known for package restrictions com.google.android.permission
+W/PackageManager(  550): No package known for package restrictions com.google.android.profiling
+W/PackageManager(  550): No package known for package restrictions com.google.android.neuralnetworks
+W/PackageManager(  550): No package known for package restrictions com.google.android.tethering
+W/PackageManager(  550): No package known for package restrictions com.google.android.btservices
+W/PackageManager(  550): No package known for package restrictions com.google.android.adbd
+W/PackageManager(  550): No package known for package restrictions com.google.android.rkpd
+W/PackageManager(  550): No package known for package restrictions com.google.android.wifi
+W/PackageManager(  550): No package known for package restrictions com.google.android.conscrypt
+W/PackageManager(  550): No package known for package restrictions com.android.nfcservices
+D/PackageManager(  550): Directories scanned as system partitions: [/system:0, /vendor:524288, /odm:4194304, /oem:262144, /product:1048576, /system_ext:2097152, /apex/com.android.conscrypt:41943040, /apex/com.android.configinfrastructure:41943040, /apex/com.android.ondevicepersonalization:41943040, /apex/com.android.nfcservices:41943040, /apex/com.android.scheduling:41943040, /apex/com.android.art:41943040, /apex/com.android.i18n:41943040, /apex/com.android.cellbroadcast:41943040, /apex/com.android.resolv:41943040, /apex/com.android.tzdata:41943040, /apex/com.android.uwb:41943040, /apex/com.android.neuralnetworks:41943040, /apex/com.android.media:41943040, /apex/com.android.media.swcodec:41943040, /apex/com.android.os.statsd:41943040, /apex/com.android.adbd:41943040, /apex/com.android.hardware.rebootescrow:42467328, /apex/com.android.apex.cts.shim:41943040, /apex/com.android.mediaprovider:41943040, /apex/com.android.extservices:41943040, /apex/com.google.mainline.primary.libs:41943040, /apex/com.android.wifi:41943040, /apex/com.android.hardware.cas:42467328, /apex/com.google.android.widevine:42467328, /apex/com.android.permission:41943040, /apex/com.android.virt:41943040, /apex/com.android.compos:44040192, /apex/com.android.sdkext:41943040, /apex/com.android.devicelock:41943040, /apex/com.android.rkpd:41943040, /apex/com.android.healthfitness:41943040, /apex/com.android.hardware.neuralnetworks:42467328, /apex/com.android.tethering:41943040, /apex/com.android.profiling:41943040, /apex/com.android.appsearch:41943040, /apex/com.android.adservices:41943040, /apex/com.android.hardware.authsecret:42467328, /apex/com.android.btservices:41943040, /apex/com.android.ipsec:41943040, /apex/com.android.runtime:41943040]
+D/PackageManager(  550): Keeping known cache 35cb56ef252d15b1349ec1623b6a3e348695ace7
+I/PackageManager(  550): /system/apex/com.android.apex.cts.shim.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.appsearch@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.art@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.adbd@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.adservices@350820260.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.cellbroadcast@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.configinfrastructure@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.conscrypt@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /system_ext/apex/com.android.compos.apex changed; collecting certs
+I/PackageManager(  550): /system/apex/com.google.android.devicelock.apex changed; collecting certs
+I/PackageManager(  550): /system/apex/com.google.android.btservices.apex changed; collecting certs
+I/PackageManager(  550): /vendor/apex/com.android.hardware.cas.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.extservices@350820303.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /vendor/apex/com.android.hardware.rebootescrow.apex changed; collecting certs
+I/PackageManager(  550): /vendor/apex/com.android.hardware.authsecret.apex changed; collecting certs
+I/PackageManager(  550): /system/apex/com.android.i18n.apex changed; collecting certs
+I/PackageManager(  550): /vendor/apex/com.android.hardware.neuralnetworks.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.ipsec@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.media@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.healthfitness@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /system/apex/com.google.android.nfcservices.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.neuralnetworks@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.media.swcodec@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.os.statsd@350820260.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.mediaprovider@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.ondevicepersonalization@350820260.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.profiling@352090000.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.permission@350820360.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /system/apex/com.android.runtime.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.rkpd@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.resolv@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.scheduling@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.sdkext@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /system/apex/com.google.android.tzdata6.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.uwb@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.tethering@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /system/apex/com.android.virt.apex changed; collecting certs
+I/PackageManager(  550): /vendor/apex/com.google.android.widevine-11775005.apex changed; collecting certs
+I/PackageManager(  550): /data/apex/decompressed/com.android.wifi@350820300.decompressed.apex changed; collecting certs
+I/PackageManager(  550): /system/apex/com.google.mainline.primary.libs.apex changed; collecting certs
+W/PackageManager(  550): Failed to parse /system/framework/oat: Missing base APK in /system/framework/oat/x86_64
+W/PackageManager(  550): Failed to parse /system/framework/x86_64: Missing base APK in /system/framework/x86_64
+W/PackageManager(  550): Skipping provider name com.google.android.settings.intelligence (in package com.google.android.settings.intelligence): name already used by com.google.android.settings.intelligence
+W/PackageManager(  550): Skipping provider name com.google.android.apps.messaging.fileprovider (in package com.google.android.apps.messaging): name already used by com.google.android.apps.messaging
+W/PackageManager(  550): Failed to parse /product/app/Chrome: Missing base APK in /product/app/Chrome
+W/PackageManager(  550): Failed to scan /product/app/Chrome-Stub: Package com.android.chrome at /product/app/Chrome-Stub ignored: updated version 636771938 better than this 636771938
+W/PackageManager(  550): Failed to parse /product/app/TrichromeLibrary: Missing base APK in /product/app/TrichromeLibrary
+W/PackageManager(  550): Failed to parse /product/app/WebViewGoogle: Missing base APK in /product/app/WebViewGoogle
+W/PackageManager(  550): Failed to scan /product/app/TrichromeLibrary-Stub: Package com.google.android.trichromelibrary_636771938 at /product/app/TrichromeLibrary-Stub ignored: updated version 636771938 better than this 636771938
+W/PackageManager(  550): Failed to scan /product/app/WebViewGoogle-Stub: Package com.google.android.webview at /product/app/WebViewGoogle-Stub ignored: updated version 636771938 better than this 636771938
+I/PackageManager(  550): Finished scanning system apps. Time: 1907 ms, packageCount: 279 , timePerPackage: 6 , cached: 0
+W/PackageManager(  550): Relax SCAN_REQUIRE_KNOWN requirement for package com.google.android.trichromelibrary_636771938
+W/PackageManager(  550): Relax SCAN_REQUIRE_KNOWN requirement for package com.google.android.webview
+W/PackageManager(  550): Relax SCAN_REQUIRE_KNOWN requirement for package com.android.chrome
+I/PackageManager(  550): Finished scanning non-system apps. Time: 66 ms, packageCount: 3 , timePerPackage: 22 , cached: 0
+I/PackageManager(  550): Time to scan packages: 1.976 seconds
+V/PackageManager(  550): reconcileAppsData for null u0 0x1 migrateAppData=true
+W/PackageManager(  550): Odd, missing scanned package dev.emucore.probe
+V/PackageManager(  550): reconcileAppsData finished 27 packages
+I/PackageManager(  550): Fix for b/169414761 is applied
+W/PackageManager(  550): Skipping preparing app data for com.google.android.devicelock
+W/PackageManager(  550): Skipping preparing app data for com.google.android.tzdata6
+W/PackageManager(  550): Skipping preparing app data for com.google.android.ondevicepersonalization
+W/PackageManager(  550): Skipping preparing app data for com.android.hardware.authsecret
+W/PackageManager(  550): Skipping preparing app data for com.google.android.media.swcodec
+W/PackageManager(  550): Skipping preparing app data for com.google.android.os.statsd
+W/PackageManager(  550): Skipping preparing app data for com.google.android.widevine.nonupdatable
+W/PackageManager(  550): Skipping preparing app data for com.google.mainline.primary.libs
+W/PackageManager(  550): Skipping preparing app data for com.google.android.extservices
+W/PackageManager(  550): Skipping preparing app data for com.android.hardware.rebootescrow
+W/PackageManager(  550): Skipping preparing app data for com.google.android.sdksandbox
+W/PackageManager(  550): Skipping preparing app data for com.google.android.healthfitness
+W/PackageManager(  550): Skipping preparing app data for com.google.android.ipsec
+W/PackageManager(  550): Skipping preparing app data for com.google.android.media
+W/PackageManager(  550): Skipping preparing app data for com.android.i18n
+W/PackageManager(  550): Skipping preparing app data for com.android.virt
+W/PackageManager(  550): Skipping preparing app data for com.google.android.appsearch
+W/PackageManager(  550): Skipping preparing app data for com.google.android.configinfrastructure
+W/PackageManager(  550): Skipping preparing app data for com.google.android.cellbroadcast
+W/PackageManager(  550): Skipping preparing app data for com.android.apex.cts.shim
+W/PackageManager(  550): Skipping preparing app data for com.android.compos
+W/PackageManager(  550): Skipping preparing app data for com.google.android.resolv
+W/PackageManager(  550): Skipping preparing app data for com.google.android.sdkext
+W/PackageManager(  550): Skipping preparing app data for com.google.android.art
+W/PackageManager(  550): Skipping preparing app data for com.google.android.uwb
+W/PackageManager(  550): Skipping preparing app data for com.google.android.runtime
+W/PackageManager(  550): Skipping preparing app data for com.android.hardware.cas
+W/PackageManager(  550): Skipping preparing app data for com.google.android.adservices
+W/PackageManager(  550): Skipping preparing app data for com.google.android.scheduling
+W/PackageManager(  550): Skipping preparing app data for com.google.android.mediaprovider
+W/PackageManager(  550): Skipping preparing app data for com.android.hardware.neuralnetworks
+W/PackageManager(  550): Skipping preparing app data for com.google.android.permission
+W/PackageManager(  550): Skipping preparing app data for com.google.android.profiling
+W/PackageManager(  550): Skipping preparing app data for com.google.android.neuralnetworks
+W/PackageManager(  550): Skipping preparing app data for com.google.android.tethering
+W/PackageManager(  550): Skipping preparing app data for com.google.android.btservices
+W/PackageManager(  550): Skipping preparing app data for com.google.android.adbd
+W/PackageManager(  550): Skipping preparing app data for com.google.android.rkpd
+W/PackageManager(  550): Skipping preparing app data for com.google.android.wifi
+W/PackageManager(  550): Skipping preparing app data for com.google.android.conscrypt
+W/PackageManager(  550): Skipping preparing app data for com.android.nfcservices
+I/PackageManager(  550): Deferred reconcileAppsData finished 255 packages
+W/PackageManager(  550): Invalid dex load report. loadingPackageName=null, uid=1037
+I/vold    (  160): onUserAdded: 0
+D/vold    (  160): fscrypt_unlock_ce_storage 0
+D/vold    (  160): Trying user CE key /data/misc/vold/user_keys/ce/0/current
+D/vold    (  160): Successfully retrieved key
+D/vold    (  160): Installed fscrypt key with ref b41f61b59738e2f28e430eae2d45dfa2 to /data
+D/vold    (  160): Installed CE key for user 0
+D/vold    (  160): fscrypt_prepare_user_storage for volume null, user 0, flags 2
+D/vold    (  160): Preparing: /data/system_ce/0
+I/vold    (  160): Verified that /data/system_ce/0 has the encryption policy b41f61b59738e2f28e430eae2d45dfa2 v2 modes 1/4 flags 0x2
+D/vold    (  160): Preparing: /data/vendor_ce/0
+I/vold    (  160): Verified that /data/vendor_ce/0 has the encryption policy b41f61b59738e2f28e430eae2d45dfa2 v2 modes 1/4 flags 0x2
+D/vold    (  160): Preparing: /data/media/0
+I/vold    (  160): Verified that /data/media/0 has the encryption policy b41f61b59738e2f28e430eae2d45dfa2 v2 modes 1/4 flags 0x2
+D/vold    (  160): Preparing: /data/misc_ce/0
+I/vold    (  160): Verified that /data/misc_ce/0 has the encryption policy b41f61b59738e2f28e430eae2d45dfa2 v2 modes 1/4 flags 0x2
+D/vold    (  160): Preparing: /data/user/0
+I/vold    (  160): Verified that /data/user/0 has the encryption policy b41f61b59738e2f28e430eae2d45dfa2 v2 modes 1/4 flags 0x2
+D/vold    (  160): Starting restorecon of /data/system_ce/0
+D/vold    (  160): Finished restorecon of /data/system_ce/0
+D/vold    (  160): Starting restorecon of /data/vendor_ce/0
+D/vold    (  160): Finished restorecon of /data/vendor_ce/0
+D/vold    (  160): Starting restorecon of /data/misc_ce/0
+D/vold    (  160): Finished restorecon of /data/misc_ce/0
+D/vold    (  160): /system/bin/vold_prepare_subdirs
+D/vold    (  160):     prepare
+D/vold    (  160):     
+D/vold    (  160):     0
+D/vold    (  160):     2
+V/PackageManager(  550): reconcileAppsData for null u0 0x2 migrateAppData=false
+W/PackageManager(  550): Skipping preparing app data for com.google.android.devicelock
+W/PackageManager(  550): Skipping preparing app data for com.google.android.tzdata6
+W/PackageManager(  550): Skipping preparing app data for com.google.android.ondevicepersonalization
+W/PackageManager(  550): Skipping preparing app data for com.android.hardware.authsecret
+W/PackageManager(  550): Skipping preparing app data for com.google.android.media.swcodec
+W/PackageManager(  550): Skipping preparing app data for com.google.android.os.statsd
+W/PackageManager(  550): Skipping preparing app data for com.google.android.widevine.nonupdatable
+W/PackageManager(  550): Skipping preparing app data for com.google.mainline.primary.libs
+W/PackageManager(  550): Skipping preparing app data for com.google.android.extservices
+W/PackageManager(  550): Skipping preparing app data for com.android.hardware.rebootescrow
+W/PackageManager(  550): Skipping preparing app data for com.google.android.sdksandbox
+W/PackageManager(  550): Skipping preparing app data for com.google.android.healthfitness
+W/PackageManager(  550): Skipping preparing app data for com.google.android.ipsec
+W/PackageManager(  550): Skipping preparing app data for com.google.android.media
+W/PackageManager(  550): Skipping preparing app data for com.android.i18n
+W/PackageManager(  550): Skipping preparing app data for com.android.virt
+W/PackageManager(  550): Skipping preparing app data for com.google.android.appsearch
+W/PackageManager(  550): Skipping preparing app data for com.google.android.configinfrastructure
+W/PackageManager(  550): Skipping preparing app data for com.google.android.cellbroadcast
+W/PackageManager(  550): Skipping preparing app data for com.android.apex.cts.shim
+W/PackageManager(  550): Skipping preparing app data for com.android.compos
+W/PackageManager(  550): Skipping preparing app data for com.google.android.resolv
+W/PackageManager(  550): Skipping preparing app data for com.google.android.sdkext
+W/PackageManager(  550): Skipping preparing app data for com.google.android.art
+W/PackageManager(  550): Skipping preparing app data for com.google.android.uwb
+W/PackageManager(  550): Skipping preparing app data for com.google.android.runtime
+W/PackageManager(  550): Skipping preparing app data for com.android.hardware.cas
+W/PackageManager(  550): Skipping preparing app data for com.google.android.adservices
+W/PackageManager(  550): Odd, missing scanned package dev.emucore.probe
+W/PackageManager(  550): Skipping preparing app data for com.google.android.scheduling
+W/PackageManager(  550): Skipping preparing app data for com.google.android.mediaprovider
+W/PackageManager(  550): Skipping preparing app data for com.android.hardware.neuralnetworks
+W/PackageManager(  550): Skipping preparing app data for com.google.android.permission
+W/PackageManager(  550): Skipping preparing app data for com.google.android.profiling
+W/PackageManager(  550): Skipping preparing app data for com.google.android.neuralnetworks
+W/PackageManager(  550): Skipping preparing app data for com.google.android.tethering
+W/PackageManager(  550): Skipping preparing app data for com.google.android.btservices
+W/PackageManager(  550): Skipping preparing app data for com.google.android.adbd
+W/PackageManager(  550): Skipping preparing app data for com.google.android.rkpd
+W/PackageManager(  550): Skipping preparing app data for com.google.android.wifi
+W/PackageManager(  550): Skipping preparing app data for com.google.android.conscrypt
+W/PackageManager(  550): Skipping preparing app data for com.android.nfcservices
+V/PackageManager(  550): reconcileAppsData finished 282 packages
+I/vold    (  160): onUserStarted: 0
+I/vold    (  160): Mounting emulated fuse volume
+I/vold    (  160): Bind mounting /data/media to /mnt/pass_through/0/emulated
+I/vold    (  160): fuse-bpf is enabled because /sys/fs/fuse/features/fuse_bpf reads 'supported'
+I/vold    (  160): Setting ro.fuse.bpf.is_running to true
+I/vold    (  160): Configuring read_ahead of /mnt/user/0/emulated fuse filesystem to 256kb
+I/vold    (  160): Writing 256 to /sys/class/bdi/0:78/read_ahead_kb
+I/vold    (  160): Configuring max_ratio of /mnt/user/0/emulated fuse filesystem to 40
+I/vold    (  160): Writing 40 to /sys/class/bdi/0:78/max_ratio
