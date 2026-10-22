@@ -1,0 +1,3 @@
+--------- beginning of main
+I/EmuCoreProbe( 2221): READY abi=arm64-v8a checksum=2206585887 touches=0
+I/EmuCoreProbe( 2221): TOUCH abi=arm64-v8a checksum=2873771296 touches=1

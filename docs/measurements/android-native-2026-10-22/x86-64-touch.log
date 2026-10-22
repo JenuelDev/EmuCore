@@ -1,0 +1,3 @@
+--------- beginning of main
+I/EmuCoreProbe( 2461): READY abi=x86_64 checksum=2206585887 touches=0
+I/EmuCoreProbe( 2461): TOUCH abi=x86_64 checksum=2873771296 touches=1

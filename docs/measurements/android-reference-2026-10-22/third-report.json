@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-22T12:15:35.7651322Z",
+  "sdk_root": "C:\\Users\\me\\AppData\\Local\\Android\\Sdk",
+  "avd": "EmuCoreReference35",
+  "serial": "emulator-5580",
+  "adb_server_port": 5039,
+  "snapshot": "disabled",
+  "graphics_requested": "host",
+  "guest_memory_mb_requested": 2048,
+  "guest_cores": 2,
+  "boot_completed_ms": 18639.2814,
+  "package_service_ready_ms": 18723.2854,
+  "graceful_shutdown": true,
+  "failure": null,
+  "cleanup_errors": [],
+  "emulator_version": "Android emulator version 36.6.11.0 (build_id 15507667) (CL:N/A)\r\nCopyright (C) 2006-2024 The Android Open Source Project and many others.\r\nThis program is a derivative of the QEMU CPU emulator (www.qemu.org).\r\n\r\n  This software is licensed under the terms of the GNU General Public\r\n  License version 2, as published by the Free Software Foundation, and\r\n  may be copied, distributed, and modified under those terms.\r\n\r\n  This program is distributed in the hope that it will be useful,\r\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n  GNU General Public License for more details.\r\n\r\nINFO         | Android emulator version 36.6.11.0 (build_id 15507667) (CL:N/A)\r\nINFO         | Graphics backend: gfxstream",
+  "acceleration_check": "accel:\r\n0\r\nWHPX(10.0.26300) is installed and usable.\r\naccel",
+  "emulator_sha256": "7F101CA769C15E8B6311801C1487F28583CE643FA87D19A9E0DA4CC230BE7653",
+  "arguments": [
+    "-avd",
+    "EmuCoreReference35",
+    "-port",
+    "5580",
+    "-accel",
+    "on",
+    "-gpu",
+    "host",
+    "-memory",
+    "2048",
+    "-cores",
+    "2",
+    "-no-window",
+    "-no-audio",
+    "-no-snapshot",
+    "-no-boot-anim",
+    "-no-metrics",
+    "-camera-back",
+    "none",
+    "-camera-front",
+    "none"
+  ],
+  "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.036/12592187:user/release-keys",
+  "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+  "ro.dalvik.vm.native.bridge": "libndk_translation.so",
+  "ro.hardware.egl": "emulation",
+  "ro.hardware.vulkan": "ranchu",
+  "guest_memtotal_kib": 2532904,
+  "process_tree_memory_snapshot": [
+    {
+      "pid": 224092,
+      "name": "emulator",
+      "private_bytes": 2297856,
+      "working_set_bytes": 11169792
+    },
+    {
+      "pid": 304040,
+      "name": "conhost",
+      "private_bytes": 2174976,
+      "working_set_bytes": 11943936
+    },
+    {
+      "pid": 334768,
+      "name": "qemu-system-x86_64-headless",
+      "private_bytes": 3918741504,
+      "working_set_bytes": 3212341248
+    },
+    {
+      "pid": 303028,
+      "name": "crashpad_handler",
+      "private_bytes": 2019328,
+      "working_set_bytes": 10776576
+    },
+    {
+      "pid": 308368,
+      "name": "netsimd",
+      "private_bytes": 10084352,
+      "working_set_bytes": 20537344
+    },
+    {
+      "pid": 250076,
+      "name": "cmd",
+      "private_bytes": 7770112,
+      "working_set_bytes": 8433664
+    },
+    {
+      "pid": 337932,
+      "name": "adb",
+      "private_bytes": 4706304,
+      "working_set_bytes": 12697600
+    }
+  ],
+  "process_tree_private_bytes_snapshot": 3947794432.0,
+  "private_adb_server_bytes_snapshot": 5328896,
+  "home_input_verified": true
+}

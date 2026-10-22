@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "built_utc": "2026-10-22T12:25:06.1298766Z",
+  "build_tools": "35.0.0",
+  "platform": "android-35",
+  "ndk": "28.2.13676358",
+  "minimum_api": 29,
+  "java_version": "openjdk version \"17.0.13\" 2024-10-15 LTS\r\nOpenJDK Runtime Environment Microsoft-10376486 (build 17.0.13+11-LTS)\r\nOpenJDK 64-Bit Server VM Microsoft-10376486 (build 17.0.13+11-LTS, mixed mode, sharing)",
+  "source_hashes": [
+    {
+      "name": "AndroidManifest.xml",
+      "sha256": "CA35F8ECB554200236ECBCE7D2E69919120FACE3F1DF92065C9EBA587EDE832D"
+    },
+    {
+      "name": "native-probe.c",
+      "sha256": "D684F4D9B9FAD0F6DBAFC347706A4E8C93A327A53D44D8AE98D22305FA232067"
+    },
+    {
+      "name": "ProbeActivity.java",
+      "sha256": "397D2FC4BF219E1BE4E0FB209BE11DE6B236888CBA8EC537236C6011A41187EA"
+    }
+  ],
+  "apks": [
+    {
+      "abi": "x86_64",
+      "path": "D:\\Projects\\Workplace\\Vocphone\\EmuCore\\artifacts\\android-fixture\\probe-x86_64.apk",
+      "sha256": "EE2B7C125692F49B49D81449849B41471B03B27D2FC251E791C4C50FD34DD95F",
+      "library_sha256": "3E222D508539558C35F1AA66AC240C62547BA2DEA6FED46156D637C0CE56EADB"
+    },
+    {
+      "abi": "arm64-v8a",
+      "path": "D:\\Projects\\Workplace\\Vocphone\\EmuCore\\artifacts\\android-fixture\\probe-arm64-v8a.apk",
+      "sha256": "48F31D52B7F942E9A333F8D7C68B46EBF3C34548A66599CB2016014D590C2B5C",
+      "library_sha256": "D8D82E54E292B22C06FDA918FE68AAD6D0BB3DC5AA0E9DA0D5646B3BEDFD7B9E"
+    }
+  ]
+}
